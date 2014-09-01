@@ -1,0 +1,277 @@
+<html>
+	<head>
+		<title>Annot</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">			
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/annot.css">
+	</head>
+	<body>
+		<div id="upMenu" class="navbar navbar-default navbar-static-top" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">AnnoT</a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<!--ul class="nav navbar-nav">
+						<li class="active"><a href="index.html">Home</a></li>
+						<li><a href="#about">About</a></li>
+						<li><a href="#contact">Contact</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="#">Action</a></li>
+								<li><a href="#">Another action</a></li>
+								<li><a href="#">Something else here</a></li>
+								<li class="divider"></li>
+								<li class="dropdown-header">Nav header</li>
+								<li><a href="#">Separated link</a></li>
+								<li><a href="#">One more separated link</a></li>
+							</ul>
+						</li>
+					</ul-->
+					<!--ul class="nav navbar-nav navbar-right">
+						<li><a href="#">Default</a></li>
+						<li class="active"><a href="#">Static top</a></li>
+						<li><a href="#">Fixed top</a></li>
+					</ul-->
+				</div>
+			</div>
+		</div>
+		<div class="main">
+			<div class="container box">
+				<div class="panel col-xs-12" id="editBox">
+					<div id="editInput" class="col-xs-12">
+                        <p style="color:gray;">Enter text here...</p>
+					</div>
+				</div>
+			</div>
+			<div class="container box">
+					<div class="col-xs-7">
+						<div id="snippetBox" class="panel">
+							The domestic cat (Felis catus or Felis silvestris catus) is a small, usually furry, domesticated, and carnivorous mammal. It is often called the housecat when kept as an indoor pet, or simply the cat when there is no need to distinguish it from other felids and felines. Cats are valued by humans for companionship and their ability to hunt vermin and household pests.
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div id="pictureBox" class="panel">
+							<img id="disPic" src="http://placekitten.com/g/180/180" alt="Picture"/> 
+						</div>
+					</div>
+					<div class="col-xs-2">
+						<div id="buttonBox panel">
+							<button id="translateButton" class="optionButton button btn btn-info">
+								<span id="showIcon" class="glyphicon glyphicon-chevron-down"></span> <span id="showText">Show source</span>
+							</button>
+						</div>
+					</div>
+			</div>
+			<div class="container box" id="translateContainer" style="display: none;">
+				<div class="panel col-xs-12" id="translateBox">
+					<div id="translateInput">
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="lib/jquery-2.1.1.js"></script>
+		<script src="lib/typeahead.bundle.js"></script>
+		<script src="lib/medium.js"></script>
+		<script src="lib/bootstrap.min.js"></script>
+		<script src="lib/underscore-min.js"></script>
+		
+        <script>
+
+var counter = 0;
+var maxresults = 5;
+var annotateMode = false;
+var firstClick = true;
+var baseuri = "https://www.wikidata.org/w/api.php?";
+var globalStore = {};
+var imgbase;
+
+$('.panel').click(function(){  
+	if (firstClick) {
+		$('#editInput').empty();
+		$('#editInput').focus();
+		firstClick = false;
+	}
+});
+
+//toggles translate button, text etc.
+function toggleTranslate() {
+	var showString = 'Show source';
+	var hideString = 'Hide source';
+	var glyphDown = 'glyphicon-chevron-down';
+	var glyphUp = 'glyphicon-chevron-up';
+
+	var container = $('#translateContainer');
+	var textSpan = $('#showText');
+	var showIcon = $('#showIcon');
+	//container.toggle();
+	$('#translateContainer').toggle();
+	if (container.is(':visible')) {
+		textSpan.text(hideString);                
+		showIcon.removeClass(glyphDown);
+		showIcon.addClass(glyphUp);
+	} else {
+		textSpan.text(showString);                
+		showIcon.removeClass(glyphUp);
+		showIcon.addClass(glyphDown);
+	}        
+}
+
+//typeahead source
+var wikidata = function() {
+  return function findMatches(q, cb) {
+	console.log(q);
+	$.ajax(
+		"https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=en&limit="+maxresults+"type=item&continue=0&search="+q,
+		{dataType: "jsonp"}
+	).done(function(data) {
+		cb(data.search);
+		//cb(_.sortBy(_.sortBy(data.results, function(b){return b.label.length}),function(s){return -s.label.search(new RegExp('^'+q,'i'))}));
+	});
+  };
+};
+		
+
+var analyze = function(e) {
+	var TABKEY = 9;
+	pushToSource();
+	if(e.keyCode == TABKEY) {
+		if (!annotateMode) {
+			counter ++;
+			annotateMode = true;
+
+			editInput = $('#editInput') 
+			allText = editInput.text();
+			lastWordIdx = allText.lastIndexOf(" ");
+			lastWord = allText.substring(lastWordIdx+1,allText.length);
+			
+			allHTML = editInput.html();
+
+			editInput.html(allHTML.substring(0,allHTML.length - lastWord.length));
+
+			placeCaretAtEnd(document.getElementById('editInput'));
+			annoT.insertHtml("<input class='word' id='w"+counter+"'></input>");
+			newInput = $('#w'+counter);
+			newInput.typeahead({
+		            hint: true,
+				    autoselect: true,
+				    highlight: true,
+				    minLength: 1
+			    },
+			    {
+			        name: 'wikidata',
+			        displayKey: 'label',
+					templates: { suggestion: function(data){
+						return '<span style="font-weight: bold; font-size: 10pt; margin-top:30px">'+data.label+'</span>'+(data.description?'<br/><span style="font-size: 8pt; text-transform:capitalize;">'+data.description+'</span>':'');
+					}},
+			        source: wikidata()
+			    });
+
+			newInput.focus();
+			newInput.val(lastWord);
+
+			newInput.on('typeahead:selected', function (event, d) {
+					annotateMode = false;
+					that = newInput;
+					$('.twitter-typeahead').remove();
+					editInput = document.getElementById('editInput')
+					placeCaretAtEnd(editInput);
+					$('#editInput').append(' <span contenteditable=false><a id='+d.id+' href="http://www.wikidata.org/wiki/Special:GoToLinkedPage/enwiki/'+d.id+'">'+d.label+'</a></span> ')
+					//ajax for picture
+					$.when( $.ajax({
+						url: baseuri + "action=wbgetentities&format=json&ids=" + d.id + "&props=claims",
+						success: function(pics) {
+							globalStore.pics = pics;
+						  },
+						 dataType: "jsonp"
+						}), $.ajax({
+						url: baseuri + "action=wbgetentities&format=json&ids=" + d.id + "&props=descriptions",
+						success: function(descs) {
+							globalStore.descs = descs;
+						  },
+						dataType: "jsonp"
+					}) ).then( function() {
+					var target = globalStore.pics.entities[d.id];
+					if (target.claims.P18 != undefined) {
+					var imagelink = "http://commons.wikimedia.org/w/thumb.php?f="+target.claims.P18[0].mainsnak.datavalue.value+"&w=233";
+					} else {
+					var imagelink = "";
+					}
+
+					var desc = globalStore.descs.entities[d.id];
+					$(document).on("mouseenter", "#"+d.id, function(){
+						$("#disPic").attr("src", imagelink.replace(/\s/g, "_"));
+
+						$("#snippetBox").text(desc.descriptions.en.value);
+					});
+					
+            } );
+         
+					console.log(d);
+					placeCaretAtEnd(editInput);
+		        });
+
+			console.log("tab")
+			return false;
+		} else {
+			annotateMode = false;
+			$('.twitter-typeahead').remove();
+			$('#editInput').append(newInput.val());
+			placeCaretAtEnd(document.getElementById('editInput'));
+		}
+
+	    if(e.preventDefault) {
+			e.preventDefault();
+		}
+//		$('#editInput > div').replaceWith('<br>');
+	}
+}
+
+
+function placeCaretAtEnd(el) {
+    el.focus();
+    if (typeof window.getSelection != "undefined"
+            && typeof document.createRange != "undefined") {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    } else if (typeof document.body.createTextRange != "undefined") {
+        var textRange = document.body.createTextRange();
+        textRange.moveToElementText(el);
+        textRange.collapse(false);
+        textRange.select();
+    }
+}
+
+editInputEl = document.getElementById('editInput');
+annoT = new Medium({
+	element: editInputEl,
+	mode: Medium.richMode,
+	tags: null,
+	attributes: {
+		remove: []
+	},
+}); 
+
+function pushToSource(){
+	$('#translateBox').text($('#editInput').html());
+}
+
+
+editInputEl.onkeydown = analyze;
+editInputEl.onmouseup = analyze;
+
+document.getElementById("translateButton").onclick = toggleTranslate;
+        </script>
+	</body>
+</html>

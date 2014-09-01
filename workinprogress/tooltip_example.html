@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Tooltip - Default functionality</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+  <script>
+         $(function() {
+            $("#tooltip").tooltip({ 
+				items: "span",
+				content: 'arbitrary <b>bold html</b>...'
+					});
+         });
+
+  </script>
+  <style>
+  label {
+    display: inline-block;
+    width: 5em;
+  }
+  .ui-tooltip {
+		max-width: 350px;
+		font-size: 8pt;
+		padding:5px;
+	}
+	
+	#tooltip {
+	background-color: yellow;
+	}
+  </style>
+</head>
+<body>
+ 
+<div><span id="tooltip">London</span> is a very beautiful place...adsfsadf </div>
+
+ 
+</body>
+</html>

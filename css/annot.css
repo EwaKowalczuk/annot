@@ -1,0 +1,141 @@
+#upMenu
+{
+	margin-bottom: 40px;
+}
+
+#editBox
+{
+	background: #E7E7E7;
+	min-height: 200px;
+	margin-bottom: 20px;
+	margin-top: 20px;
+}
+
+#translateBox
+{
+	background: #E7E7E7;
+	min-height: 200px;
+	margin-bottom: 20px;
+	margin-top: 10px;
+}
+
+#editInput
+{
+	padding: 10px;
+}
+
+#translateInput
+{
+	padding: 10px;
+}
+
+#editInput:focus
+{
+    outline: 0;
+}
+
+#editInput:focus
+{
+    outline: 0;
+}
+
+#snippetBox
+{
+	background: #b1cfd8;
+	height: 200px;
+	margin-left: 0px;
+	margin-right: 0px;
+	padding: 15px;
+}
+
+#pictureBox
+{
+	background: #b1cfd8;
+	height: 200px;
+	width: 100%;
+	margin-right: 0px;
+	margin-left: 0px;
+	padding: 10px;
+	position: relative;
+}
+
+#translateButton
+{
+/*	margin-bottom: 0px; */
+}
+
+#translateButton:focus
+{
+    outline: 0;
+}
+
+#modeButton
+{
+	margin-bottom: 30px;
+}
+
+img {
+	max-width: 100%;
+	max-height:100%;
+	}
+
+.optionButton
+{
+	width: 100%;
+	margin-top: 100%;
+}
+
+#disPic
+{
+/*	display: block;
+	margin: 0 auto;*/
+	max-width: 100%;
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.tt-input
+{
+	background-color:rgba(120,120,120,0.5) !important;
+	border: 1px;
+	border-radius: 4px;
+	margin-top: -16px;
+	padding-left:5px;
+	/*margin-left: 5px;*/
+}
+
+
+.tt-input:focus
+{
+    outline: 0;
+}
+
+.tt-dropdown-menu
+{
+	background-color:rgba(255,0.5,0.5);
+	border: 0px;
+
+	/*margin-left: 5px;*/
+}
+
+.tt-dataset-wikidata
+{
+	background-color:lightgray;
+	padding-left:5px;
+	padding-right:5px;
+}
+
+.tt-cursor{
+    color:#F2F2F2;
+
+
+}
+
+.tt-hint
+{
+	background-color:rgba(255,0,0,0) !important;
+}
